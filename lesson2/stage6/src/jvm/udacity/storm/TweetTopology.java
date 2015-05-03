@@ -16,6 +16,12 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 
+import udacity.storm.CountBolt;
+import udacity.storm.ParseTweetBolt;
+import udacity.storm.ReportBolt;
+import udacity.storm.TweetSpout;
+
+
 class TweetTopology
 {
   public static void main(String[] args) throws Exception
@@ -34,10 +40,10 @@ class TweetTopology
 
     // now create the tweet spout with the credentials
     TweetSpout tweetSpout = new TweetSpout(
-        "[Your customer key]",
-        "[Your secret key]",
-        "[Your access token]",
-        "[Your access secret]"
+        "vcsty6dNgXIQld3kOzVOl6flk",//"[Your customer key]","
+        "vEMoDQLSBLa6PL5TYUtNUg70QmfOCH6bP2oT2L9D2BdVU42IsT",//"[Your secret key]",
+        "35245669-lbHNqeKL29yRjwr1stgfEK0pRbYAMFGei8VzjTXfX",//"[Your access token]",
+        "kfal1S7pWX691JlmAuKAI00j2CeYbujHingNzmc7CXLsK"//"[Your access secret]"
     );
 
     //*********************************************************************
@@ -50,6 +56,10 @@ class TweetTopology
 
 
     //*********************************************************************
+
+    builder.setBolt("tweetParse-bolt",new ParseTweetBolt(), 10).shuffleGrouping("tweet-spout");
+    builder.setBolt("tweetCount-bolt",new CountBolt(), 15).fieldsGrouping("tweetParse-bolt", new Fields("tweet-word"));
+    builder.setBolt("tweetReport-bolt",new ReportBolt(), 1).globalGrouping("tweetCount-bolt");
 
     // create the default config object
     Config conf = new Config();
