@@ -56,7 +56,7 @@ class TweetTopology
 
 
     //*********************************************************************
-
+    buillder.setSpout("tweet-spout", TweetSpout, 1);
     builder.setBolt("tweetParse-bolt",new ParseTweetBolt(), 10).shuffleGrouping("tweet-spout");
     builder.setBolt("tweetCount-bolt",new CountBolt(), 15).fieldsGrouping("tweetParse-bolt", new Fields("tweet-word"));
     builder.setBolt("tweetReport-bolt",new ReportBolt(), 1).globalGrouping("tweetCount-bolt");
